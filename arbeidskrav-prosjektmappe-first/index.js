@@ -22,7 +22,7 @@ const swordBuy = document.getElementById("buy-sword-btn")
 
 const buildingOutput = document.getElementById("building-div")
 
-const testing = document.getElementById("warrior-1")
+const changingCharacter = document.getElementById("warrior-1")
 
 const monsterOutput = document.getElementById("monster-div")
 
@@ -34,6 +34,8 @@ let hut1Count = 0;
 let hut2Count = 0;
 let bygninger = 0;
 let playerhp = 300;
+
+let characterSelectCounter = 1
 
 // this controls the damage the user can deal and checks if they already have upgraded their weapon
 let swordHasBeenUpgraded = false;
@@ -76,6 +78,7 @@ let monster2Alive = false
 let monster0Health = 0;
 let monster1Health = 0;
 let monster2Health = 0;
+
 let monster0Damage = 0;
 let monster1Damage = 0;
 let monster2Damage = 0;
@@ -99,26 +102,33 @@ function updateMaterials(){
 function updatingPlayerHP(){
     hp.style.width = `${playerhp}px`
     if (playerhp <= 0){
-        alert("You have died!")
+        alert("You have died! click f5 to restart the game if you dare!")
     }
 }
 
+//this will check if the game can still run
+
 function checkingIfTheGameIsDone(){
     if (noMoreTreeResources === true && treverk === 0){
-    alert("The game is over, you have cannot build more huts since there is no more trees and you still have hp left :D, you can refresh the page if you wish to play again.")
+    alert("The game is over, you have successfully built your village and defended it from savage beasts!")
+    alert("If this was too easy, you can change the monsterDamageMultiper if you dare!")
     }else{
         checkingIfThereAreMoreTrees()
     }
 }
 
+//this checks if the user can get more tree resources if they cant and they have no more tree then the game is over since the village is built
 function checkingIfThereAreMoreTrees(){
-    console.log(`${tree1Count} ${tree2Count} ${tree3Count}`)
+    //console.log(`${tree1Count} ${tree2Count} ${tree3Count}`)
     if (tree1Count === 10 && tree2Count === 10 && tree3Count === 10){
         noMoreTreeResources = true
     }else{
         noMoreTreeResources = false
     }
 }
+
+//this will update the log at the buttom of the screen
+//I limited this to 5 since the page would keep expanding if i didnt.
 
 
 function updateOutput(){
@@ -134,6 +144,19 @@ function updateOutput(){
             Output.innerHTML += `<ul>${logArray[i]}</ul>`
         }
     }       
+}
+
+//You can click on your character if you want to change the sprite. Probably a simpler way to do this.
+
+function changingCharacterSprite(){
+    //console.log("I've been clicked!")
+    characterSelectCounter += 1
+    if (this.id === "warrior-1" && characterSelectCounter % 2 === 0){
+        changingCharacter.src = "images/warrior2.png"
+    }else if(this.id ==="warrior-1" && characterSelectCounter % 2 != 0) {
+        changingCharacter.src = "images/warrior.png"
+
+    }
 }
 
 //collectWood controls resource gathering for trees and limits it to 10 clicks per tree
@@ -178,6 +201,8 @@ function collectWood(){
     }
 }
 
+//this is responsible for giving the player minerals and rolls the dice to see if monsters appear.
+
 
 function collectMinerals(){
     //console.log("collectMinerals has been activated")
@@ -186,9 +211,9 @@ function collectMinerals(){
 
         //rolling the dice to see if the player gets attacked
         chanceOfBeingAttacked = Math.random();
-        console.log(`${chanceOfBeingAttacked}`)
+        //console.log(`${chanceOfBeingAttacked}`)
         if (chanceOfBeingAttacked < 0.1){
-            console.log("player has been attacked so they shouldnt get materials")
+            //console.log("player has been attacked so they shouldnt get materials")
             underAttack = true
             spawnEnemies()
 
@@ -196,7 +221,7 @@ function collectMinerals(){
             metall += miningForMaterialsReward;
             logArray.unshift(`${totalActions} :  You venture into the mine. Reward ${miningForMaterialsReward}: `)
             updateMaterials()
-            console.log("player is not under attack so player gets materials")
+            //console.log("player is not under attack so player gets materials")
 
         }
     }
@@ -206,12 +231,14 @@ function collectMinerals(){
     }
 }
 
+//reponsible for hut building
+
 function buyHut1(){
     if (underAttack === false){
         if (this.id === "buy-building-1-btn"){
-            console.log("buyHut1 has been activated")
+            //console.log("buyHut1 has been activated")
             if (hut1CostWood <= treverk && hut1CostMetal <= metall){
-                console.log("Material cost passed")
+                //console.log("Material cost passed")
                 hut1Count += 1;
                 bygninger = hut1Count + hut2Count;
                 //console.log(`total huts: ${bygninger}`)
@@ -230,13 +257,14 @@ function buyHut1(){
         updateMaterials()
     }
 }
+//reponsible for hut building
 
 function buyHut2(){
     if (underAttack === false){
         if (this.id === "buy-building-2-btn"){
-            console.log("buyHut2 has been activated")
+            //console.log("buyHut2 has been activated")
             if (hut2CostWood <= treverk && hut2CostMetal <= metall){
-                console.log("Material cost passed")
+                //console.log("Material cost passed")
                 hut2Count += 1;
                 bygninger = hut1Count + hut2Count;
                 //console.log(`total huts: ${bygninger}`)
@@ -255,10 +283,12 @@ function buyHut2(){
     }
 }
 
+//responsible for sword buying
+
 function buySword(){
     if (underAttack === false){
         if (this.id === "buy-sword-btn"){
-            console.log("buySword has been activated")
+            //console.log("buySword has been activated")
             if (swordMetalCost <= metall && swordHasBeenUpgraded === false){
                 styrke = 40;
                 swordHasBeenUpgraded = true;
@@ -266,7 +296,7 @@ function buySword(){
                 metall -= swordMetalCost
                 updateMaterials()
             }else{
-                console.log("You have already upgraded your sword")
+                alert("You have already upgraded your sword")
             }
         }
     }
@@ -276,26 +306,32 @@ function buySword(){
     }
 }
 
+//rolls the dice to see how many enemys spawn
+
 function amountOfEnemies(){
     if (underAttack === true){
         enemyCount = Math.floor(Math.random() * (3-1 +1) + 1)
-        console.log(`AmountOfEnemys should return: ${enemyCount}`)
+        //console.log(`AmountOfEnemys should return: ${enemyCount}`)
         return enemyCount;
         }
     }
+
+//Spawns the enemies
 
 function spawnEnemies(){
     amountOfEnemies()
     for (let i = 0; i < enemyCount; i++){
         monsterOutput.innerHTML += `<img id=monster${i} src="images/cute-wolfman.png">`
         logArray.unshift(`${totalActions}: A monster has appeared!`)
-        console.log("something")
+        //console.log("something")
         updateMaterials()
     }
-    console.log(enemyCount)
+    //console.log(enemyCount)
     settingUpEnemies()
 
 }
+
+//sets up the stats of the enemies so we can have multiple rounds of battles.
 function settingUpEnemies(){
     if (enemyCount === 3){
         monster0Health = 40;
@@ -325,11 +361,12 @@ function settingUpEnemies(){
         monster0.onclick = combat
         monster0Alive = true
     }
-    console.log(monster0Health)
-    console.log(monster1Health)
-    console.log(monster2Health)
+    //console.log(monster0Health)
+    //console.log(monster1Health)
+    //console.log(monster2Health)
 }
-    
+
+//This is the combat system
 function combat(){
         if (underAttack === true){
             if (this.id === "monster0"){                
@@ -344,28 +381,28 @@ function combat(){
                 playerhp -= monster1Damage
                 logArray.unshift(`${totalActions}: You deal ${styrke} to the monster2, it now has ${monster1Health} hp left. the monster managed to hit you for ${monster1Damage}`)
                 updateMaterials()
-                console.log(monster1Health)
+                //console.log(monster1Health)
             }else if (this.id === "monster2" ){
                 monster2Health -= styrke
                 monster2Damage = Math.floor(Math.random() * monsterDamageMultiplier)
                 playerhp -= monster2Damage
                 logArray.unshift(`${totalActions}: You deal ${styrke} to the monster3, it now has ${monster2Health} hp left, the monster managed to hit you for ${monster2Damage}`)
                 updateMaterials()
-                console.log(monster2Health)
+                //console.log(monster2Health)
             }
             if (monster0Health === 0 && monster0Alive === true){
                 monster0.style.opacity = "0%"
-                console.log("monster0 dies")
+                //console.log("monster0 dies")
                 monster0Alive = false
             }
             if (monster1Health === 0 && monster1Alive === true){
                 monster1.style.opacity = "0%"
-                console.log("monster1 dies")
+                //console.log("monster1 dies")
                 monster1Alive = false
             }
             if (monster2Health === 0 && monster2Alive === true){
                 monster2.style.opacity = "0%"
-                console.log("monster2 dies")
+                //console.log("monster2 dies")
                 monster2Alive = false
             }
             if (monster0Alive === false && monster1Alive === false && monster2Alive === false){
@@ -385,6 +422,7 @@ hut1Buy.onclick = buyHut1
 hut2Buy.onclick = buyHut2
 swordBuy.onclick = buySword
 
+changingCharacter.onclick = changingCharacterSprite
 
 
 
