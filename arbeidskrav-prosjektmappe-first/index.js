@@ -3,6 +3,8 @@
 //Started 10.12.2022
 //CSS and HTML has been written by Høyskolen i Kristiania.
 
+const interface = document.getElementById("interface")
+
 const hp = document.getElementById("life-bar")
 const materialInfo = document.getElementById("material-info")
 
@@ -20,7 +22,7 @@ const swordBuy = document.getElementById("buy-sword-btn")
 
 const buildingOutput = document.getElementById("building-div")
 
-const checkingRandom = document.getElementById("warrior-1")
+const testing = document.getElementById("warrior-1")
 
 const monsterOutput = document.getElementById("monster-div")
 
@@ -60,13 +62,14 @@ let swordMetalCost = 200;
 let tree1Count = 0;
 let tree2Count = 0;
 let tree3Count = 0;
+let noMoreTreeResources = false
 
 //this is an array for storing the users recent actions and displaying it on screen
 let logArray = []
 
 //this is for combat
 let underAttack = false
-
+let monsterDamageMultiplier = 10; // 10 is default
 let monster0Alive = false
 let monster1Alive = false
 let monster2Alive = false
@@ -86,10 +89,37 @@ function updateMaterials(){
     totalActions += 1
     materialInfo.innerHTML = `Treverk: ${treverk} enheter Metall: ${metall} enheter Antall bygninger: ${bygninger}  Styrke: ${styrke}`
     hp.innerHTML = playerhp
+    updatingPlayerHP()
     updateOutput()
+    checkingIfTheGameIsDone()
 }
 
 //This will display the a log to the user of events
+
+function updatingPlayerHP(){
+    hp.style.width = `${playerhp}px`
+    if (playerhp <= 0){
+        alert("You have died!")
+    }
+}
+
+function checkingIfTheGameIsDone(){
+    if (noMoreTreeResources === true && treverk === 0){
+    alert("The game is over, you have cannot build more huts since there is no more trees and you still have hp left :D, you can refresh the page if you wish to play again.")
+    }else{
+        checkingIfThereAreMoreTrees()
+    }
+}
+
+function checkingIfThereAreMoreTrees(){
+    console.log(`${tree1Count} ${tree2Count} ${tree3Count}`)
+    if (tree1Count === 10 && tree2Count === 10 && tree3Count === 10){
+        noMoreTreeResources = true
+    }else{
+        noMoreTreeResources = false
+    }
+}
+
 
 function updateOutput(){
     Output.innerHTML = `<div></div>`
@@ -142,7 +172,12 @@ function collectWood(){
             }
         }            
     }
+    if(underAttack === true){
+        logArray.unshift(`${totalActions}: You must deal with the monsters before you can do any action!`)
+        updateMaterials()
+    }
 }
+
 
 function collectMinerals(){
     //console.log("collectMinerals has been activated")
@@ -165,6 +200,10 @@ function collectMinerals(){
 
         }
     }
+    if(underAttack === true){
+        logArray.unshift(`${totalActions}: You must deal with the monsters before you can do any action!`)
+        updateMaterials()
+    }
 }
 
 function buyHut1(){
@@ -186,6 +225,10 @@ function buyHut1(){
             }
         }
     }
+    if(underAttack === true){
+        logArray.unshift(`${totalActions}: You must deal with the monsters before you can do any action!`)
+        updateMaterials()
+    }
 }
 
 function buyHut2(){
@@ -206,6 +249,10 @@ function buyHut2(){
             }
         }
     }
+    if(underAttack === true){
+        logArray.unshift(`${totalActions}: You must deal with the monsters before you can do any action!`)
+        updateMaterials()
+    }
 }
 
 function buySword(){
@@ -222,6 +269,10 @@ function buySword(){
                 console.log("You have already upgraded your sword")
             }
         }
+    }
+    if(underAttack === true){
+        logArray.unshift(`${totalActions}: You must deal with the monsters before you can do any action!`)
+        updateMaterials()
     }
 }
 
@@ -283,37 +334,37 @@ function combat(){
         if (underAttack === true){
             if (this.id === "monster0"){                
                 monster0Health -= styrke
-                monster0Damage = Math.floor(Math.random() *10)
+                monster0Damage = Math.floor(Math.random() * monsterDamageMultiplier)
                 playerhp -= monster0Damage
                 logArray.unshift(`${totalActions}: You deal ${styrke} to the monster1, it now has ${monster0Health} hp left, the monster managed to hit you for ${monster0Damage}`)
                 updateMaterials()
             }else if (this.id == "monster1"){
                 monster1Health -= styrke
-                monster1Damage = Math.floor(Math.random() *10)
+                monster1Damage = Math.floor(Math.random() * monsterDamageMultiplier)
                 playerhp -= monster1Damage
                 logArray.unshift(`${totalActions}: You deal ${styrke} to the monster2, it now has ${monster1Health} hp left. the monster managed to hit you for ${monster1Damage}`)
                 updateMaterials()
                 console.log(monster1Health)
             }else if (this.id === "monster2" ){
                 monster2Health -= styrke
-                monster2Damage = Math.floor(Math.random() *10)
+                monster2Damage = Math.floor(Math.random() * monsterDamageMultiplier)
                 playerhp -= monster2Damage
                 logArray.unshift(`${totalActions}: You deal ${styrke} to the monster3, it now has ${monster2Health} hp left, the monster managed to hit you for ${monster2Damage}`)
                 updateMaterials()
                 console.log(monster2Health)
             }
             if (monster0Health === 0 && monster0Alive === true){
-                monster0.style.display = "none"
+                monster0.style.opacity = "0%"
                 console.log("monster0 dies")
                 monster0Alive = false
             }
             if (monster1Health === 0 && monster1Alive === true){
-                monster1.style.display = "none"
+                monster1.style.opacity = "0%"
                 console.log("monster1 dies")
                 monster1Alive = false
             }
             if (monster2Health === 0 && monster2Alive === true){
-                monster2.style.display = "none"
+                monster2.style.opacity = "0%"
                 console.log("monster2 dies")
                 monster2Alive = false
             }
@@ -324,7 +375,6 @@ function combat(){
         }
     }
 
-
 tree1.onclick = collectWood
 tree2.onclick = collectWood
 tree3.onclick = collectWood
@@ -334,6 +384,7 @@ mine.onclick = collectMinerals
 hut1Buy.onclick = buyHut1
 hut2Buy.onclick = buyHut2
 swordBuy.onclick = buySword
+
 
 
 
