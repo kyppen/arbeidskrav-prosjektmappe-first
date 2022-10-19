@@ -164,6 +164,13 @@ function changingCharacterSprite(){
 
 function collectWood(){
     if (underAttack === false){
+        chanceOfBeingAttacked = Math.random();
+        //console.log(`${chanceOfBeingAttacked}`)
+        if (chanceOfBeingAttacked < 0.2){
+            //console.log("player has been attacked so they shouldnt get materials")
+            underAttack = true
+            spawnEnemies()
+        }
         if (this.id === "tree-1" || this.id === "tree-2" || this.id === "tree-3"){
             treverk += cuttingWoodReward;
             logArray.unshift(`${totalActions} : You chop some trees. Rewards: ${cuttingWoodReward}`)
@@ -212,7 +219,7 @@ function collectMinerals(){
         //rolling the dice to see if the player gets attacked
         chanceOfBeingAttacked = Math.random();
         //console.log(`${chanceOfBeingAttacked}`)
-        if (chanceOfBeingAttacked < 0.1){
+        if (chanceOfBeingAttacked < 0.2){
             //console.log("player has been attacked so they shouldnt get materials")
             underAttack = true
             spawnEnemies()
